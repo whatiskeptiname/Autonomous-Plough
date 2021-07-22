@@ -3,8 +3,8 @@
 #define mA2 11
 #define mB1 10   // B motor
 #define mB2 9
-#define  trigPin 8 // trigger pin of ultrasonic sensor
-#define  echoPin 7 // echo pin of ultrasonic sensor
+#define trigPin 8 // trigger pin of ultrasonic sensor
+#define echoPin 7 // echo pin of ultrasonic sensor
 #define buzzer 5 // buzzer pin 
 
 
@@ -105,84 +105,41 @@ void wait() // stop the bot
   servo.write(100); // lift the plough if stopped
 }
 
-void auto_mode()
+void auto_forward(int f_length) // move the robot forward for a given distance and wait when obstacle is within 10 
 {
-  for (int i = 1; i <= 50; i++)
-    {
+  for (int j = 0; j < f_length; j++)
+  {
     proximity();
+    if (input == 5) break;
     forward();
+    delay(100);
+  }
+}
+void auto_mode(int length, int width)
+{
+  // if length, width, bot_width, turn_delay don't work on the default setting try adding a 
+  // factor to increase or decreadse these value before seeding it in the functions
 
-    if (input == 5)
-    {
-      break;
-    }
-    }
+  int turn_delay = 500; // time taken by bot to turn 90 degrees on either direction
+  int bot_width = 20; // bot's width in cm
+  int width_loop = width/ bot_width; // number of loops to cover the total width of field
 
-    for (long int i = 1; i <= 10; i++)
+  for (int i = 0; i < width_loop; i++)
     {
-    proximity();
-    right();
-
-    if (input == 5)
-    {
-      break;
-    }
-    }
-
-    for (long int i = 1; i <= 5; i++)
-    {
-    proximity();
-    forward();
-
-    if (input == 5)
-    {
-      break;
-    }
-    }
-
-    for (long int i = 1; i <= 10; i++)
-    {
-    proximity();
-    right();
-
-    if (input == 5)
-    {
-      break;
-    }
-    }
-    for (long int i = 1; i <= 50; i++)
-    {
-    proximity();
-    forward();
-
-    if (input == 5)
-    {
-      break;
-    }
-    }
-
-    for (long int i = 1; i <= 10; i++)
-    {
-    proximity();
-    left();
-
-    if (input == 5)
-    {
-      break;
-    }
-    }
-
-    for (long int i = 1; i <= 5; i++)
-    {
-    proximity();
-    forward();
-    }
-
-
-    for (long int i = 1; i <= 10; i++)
-    {
-    proximity();
-    left();
+      // below code makes the bot to complete a loop and come to initial position 3 bot_width far from 
+      // the starting point
+      auto_forward(length);
+      right();
+      delay(turn_delay);
+      auto_forward(bot_width);
+      right();
+      delay(turn_delay);
+      auto_forward(length);
+      left();
+      delay(turn_delay);
+      auto_forward(bot_width);
+      left();
+      if (input == 5) break; // break from outer loop
     }
 }
 
@@ -198,7 +155,7 @@ void loop() // main loop
   }
   else
   {
-    switch (input)
+    switch (input) 
     {
       case '0':
         wait();
@@ -228,12 +185,11 @@ void loop() // main loop
         noTone(buzzer);
         break;
       case '9':
-        for (int j = 1; j <= 1; j++)
-        {
-          auto_mode();
-          if (input == 5) break;
-        }
-        break;
+          // length and width values are given directly to function
+          // this can be improved by getting it from bluetooth device or wifi enabled devices
+          // some improvement to the hardware and code should be done before that.
+          auto_mode(100, 100);// dummy value for lenght and width of the field
+          break;
       deafult:
         wait();
     }
