@@ -107,12 +107,14 @@ void wait() // stop the bot
 
 void auto_forward(int f_length) // move the robot forward for a given distance and wait when obstacle is within 10 
 {
-  for (int j = 0; j < f_length; j++)
+  for (int j = 0; j < f_length;)
   {
     proximity();
     if (input == 5) break;
     forward();
     delay(100);
+    if (dist <10) continue;  // increase j only when the bot is moving
+    j++;
   }
 }
 void auto_mode(int length, int width)
