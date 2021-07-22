@@ -1,71 +1,56 @@
+#include <Servo.h> // Servo library
 #define mA1 12   // A motor
 #define mA2 11
 #define mB1 10   // B motor
 #define mB2 9
-#define  trigPin 8
-#define  echoPin 7
-#define buzzer 5
-#include <Servo.h>
-Servo servo;
+#define  trigPin 8 // trigger pin of ultrasonic sensor
+#define  echoPin 7 // echo pin of ultrasonic sensor
+#define buzzer 5 // buzzer pin 
 
-long int dist, duration, input;
-void sensor_check()
-{
-  // The sensor is triggered by a HIGH pulse of 10 or more microseconds.
-  // Give a short LOW pulse beforehand to ensure a clean HIGH pulse:
 
+int input; // input form the serial communication (bluetooth device)
+int dist; // distance measured by ultrasonic sensor
+Servo servo; // Servo object
+
+void get_data()
+{ // calculate the distance measured by ultrasonic sensor 
   digitalWrite(trigPin, LOW);
   delayMicroseconds(5);
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
   digitalWrite(trigPin, LOW);
 
-  // Read the signal from the sensor: a HIGH pulse whose
-  // duration is the time (in microseconds) from the sending
-  // of the ping to the reception of its echo off of an object.
-
-  duration = pulseIn(echoPin, HIGH);
-
-  // convert the time into a distance
-
+  long duration = pulseIn(echoPin, HIGH);
   dist = (duration / 2) / 29.1;
-
-  //read tx inputa
+  // get the serial input from the bluetooth device
   if (Serial.available() > 0)
   {
     input = Serial.read();
   }
-  else
-  {
-    wait();
-  }
-
+  // print the distance and serial data to searial monitor
   Serial.print(dist);
   Serial.print(" cm ");
   Serial.print("data: ");
-  Serial.print(input);
-  Serial.println();
+  Serial.println(input);
 }
 
-void beep()
+void beep() // to play tone from buzzer
 {
-  tone(buzzer, 900);
+  tone(buzzer, 900); // play 900Hz tone
   delay(200);
   tone(buzzer, 1000);
   delay(200);
+  noTone(buzzer);
 }
 
-void dist_check()
+void proximity() // check for obstacle
 {
-  if (dist <= 10)
+  get_data();
+  if (dist <= 10) // if obstacle is within 10 cm
   {
     wait();
+    servo.write(100);
     beep(); 
-    servo.write(90);
-  }
-  else
-  {
-    noTone(buzzer);
   }
 }
 
@@ -78,57 +63,56 @@ void setup()
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
 
-  servo.attach(6);
-  Serial.begin(9600);
+  servo.attach(6); // attach servo to pin 6
+  Serial.begin(9600); // set the serial communication to 9600 baud
 }
 
-void left()
+void left() // move the robot to the left
 {
   digitalWrite(mA1, LOW);
   digitalWrite(mA2, HIGH);
   digitalWrite(mB1, HIGH);
   digitalWrite(mB2, LOW);
-  //servo.write(100);
+  servo.write(100); // lift the plough while turning
 }
-void right()
+void right() // move the robot to the right
 {
   digitalWrite(mA1, HIGH);
   digitalWrite(mA2, LOW);
   digitalWrite(mB1, LOW);
   digitalWrite(mB2, HIGH);
-  //servo.write(100);
+  servo.write(100); // lift the plough while turning
 }
-void backward()
+void backward() // move the robot backward
 {
   digitalWrite(mA1, HIGH);
   digitalWrite(mA2, LOW);
   digitalWrite(mB1, HIGH);
   digitalWrite(mB2, LOW);
-  //servo.write(  100);
+  servo.write(100); // lift the plough while turning
 }
-void forward()
+void forward() // move the robot forward
 {
   digitalWrite(mA1, LOW);
   digitalWrite(mA2, HIGH);
   digitalWrite(mB1, LOW);
   digitalWrite(mB2, HIGH);
-  //servo.write(55);
+  servo.write(55); // put the plough down while moving forward
 }
-void wait()
+void wait() // stop the bot
 {
   digitalWrite(mA1, LOW);
   digitalWrite(mA2, LOW);
   digitalWrite(mB1, LOW);
   digitalWrite(mB2, LOW);
-  //servo.write(100);
+  servo.write(100); // lift the plough if stopped
 }
 
-void AI()
+void auto_mode()
 {
-  /*for (long int i = 1; i <= 50; i++)
+  for (int i = 1; i <= 50; i++)
     {
-    sensor_check();
-    dist_check();
+    proximity();
     forward();
 
     if (input == 5)
@@ -139,8 +123,7 @@ void AI()
 
     for (long int i = 1; i <= 10; i++)
     {
-    sensor_check();
-    dist_check();
+    proximity();
     right();
 
     if (input == 5)
@@ -151,8 +134,7 @@ void AI()
 
     for (long int i = 1; i <= 5; i++)
     {
-    sensor_check();
-    dist_check();
+    proximity();
     forward();
 
     if (input == 5)
@@ -163,8 +145,7 @@ void AI()
 
     for (long int i = 1; i <= 10; i++)
     {
-    sensor_check();
-    dist_check();
+    proximity();
     right();
 
     if (input == 5)
@@ -174,8 +155,7 @@ void AI()
     }
     for (long int i = 1; i <= 50; i++)
     {
-    sensor_check();
-    dist_check();
+    proximity();
     forward();
 
     if (input == 5)
@@ -186,8 +166,7 @@ void AI()
 
     for (long int i = 1; i <= 10; i++)
     {
-    sensor_check();
-    dist_check();
+    proximity();
     left();
 
     if (input == 5)
@@ -195,104 +174,71 @@ void AI()
       break;
     }
     }
-
 
     for (long int i = 1; i <= 5; i++)
     {
-    sensor_check();
-    dist_check();
+    proximity();
     forward();
     }
 
 
     for (long int i = 1; i <= 10; i++)
     {
-    sensor_check();
-    dist_check();
+    proximity();
     left();
     }
-  */
-  forward();
-  delay(2000);
-  right();
-  delay(400);
-  forward();
-  delay(100);
-  right();
-  delay(1000);
-  forward();
-  delay(3000);
-
 }
 
-void loop()
+void loop() // main loop
 {
-  sensor_check();
+  get_data(); // get the senosr and serial data
+  servo.write(100); // lift the plough
 
-  servo.write(100);
-
-  if (dist <= 10)
-  {
+  if (dist <= 10) // dist is taken from global variable (don't do that)
+  { // while there is obstacle within 10cm stop and beep
     wait();
     beep();
   }
-
   else
   {
-    noTone(buzzer);
-
     switch (input)
     {
       case '0':
         wait();
         break;
-
       case '1':
         forward();
         break;
-
       case '2':
         right();
         break;
-
       case '3':
         backward();
         break;
-
       case '4':
         left();
         break;
-
       case 'a':
         servo.write(55);
         break;
-
       case 'b':
         servo.write(100);
         break;
-
       case '7':
         beep();
         break;
-
       case '8':
         noTone(buzzer);
         break;
-
       case '9':
         for (int j = 1; j <= 1; j++)
         {
-          AI();
-          if (input == 5)
-          {
-            break;
-          }
+          auto_mode();
+          if (input == 5) break;
         }
-        break;a
-
-deafult:
-        wait();
         break;
+      deafult:
+        wait();
     }
   }
 }
