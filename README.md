@@ -2,10 +2,10 @@
 
 Autonomous-Plough is a bot created for Himalaya Exhibition (HEx) 2018. It was able to plough a given area and response to the obstacles during this process.
 
-## Images
+## Image
 
 <div align="center">
-   <img src="./images/autonomous-plough.jpg" width="40%" height="40%" />
+   <img src="./images/autonomous-plough.jpg" width="60%" height="60%" />
 </div>
 
 ## Components Used
@@ -20,4 +20,4 @@ Autonomous-Plough is a bot created for Himalaya Exhibition (HEx) 2018. It was ab
 
 ## Working
 
-This bot can be operated manually or autonomously. In manual mode all the commands are given via serial communication (Bluetooth in this case). Once autonomous mode is activated, the bot will divide the given length in to equal segments wher each segment is equal to double the width of the plough. It will then plough the segment and respond to the obstacles. This will continue until the entire area is ploughed.
+This bot can be operated manually or autonomously. In manual mode all the commands are given via serial communication (Bluetooth in this case). Once autonomous mode is activated, the bot will divide the given length in to equal segments where each segment is equal to double the width of the plough. It will then plough the segment and stops and beep when any obstacle is encountered. This will continue until the entire area is ploughed.
