@@ -23,10 +23,7 @@ void get_data()
   long duration = pulseIn(echoPin, HIGH);
   dist = (duration / 2) / 29.1;
   // get the serial input from the bluetooth device
-  if (Serial.available() > 0)
-  {
-    input = Serial.read();
-  }
+  if (Serial.available() > 0) input = Serial.read();
   // print the distance and serial data to searial monitor
   Serial.print(dist);
   Serial.print(" cm ");
@@ -36,7 +33,7 @@ void get_data()
 
 void beep() // to play tone from buzzer
 {
-  tone(buzzer, 900); // play 900Hz tone
+  tone(buzzer, 800); // play 900Hz tone
   delay(200);
   tone(buzzer, 1000);
   delay(200);
